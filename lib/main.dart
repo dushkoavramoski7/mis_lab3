@@ -106,7 +106,7 @@ class _AppScheduleState extends State<AppSchedule> {
                                 fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            _getExamTime(_terms.elementAt(index).examScheduled),
+                            'Date: ${_getExamTime(_terms.elementAt(index).examScheduled)}',
                             style: const TextStyle(
                                 fontSize: 14, color: Colors.grey),
                           ),
