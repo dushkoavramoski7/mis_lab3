@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mis_lab3/model/term.dart';
+import 'package:mis_lab3/widget/NewTerm.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final Color primaryColor = Colors.teal;
+  final Color primaryColor = Colors.lightBlue;
 
   const MyApp({super.key});
 
@@ -21,33 +23,56 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page', elements: [
-        "Prv",
-        "Vtor",
-        "Tret",
-        "Cetvrt",
-        "Pet",
-        "Shest",
-        "Tret",
-        "Cetvrt",
-        "Pet",
-        "Shest"
-      ]),
+      home: const AppSchedule(title: 'App scheduler'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.elements});
+class AppSchedule extends StatefulWidget {
+  const AppSchedule({super.key, required this.title});
 
   final String title;
-  final List<String> elements;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AppSchedule> createState() => _AppScheduleState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _AppScheduleState extends State<AppSchedule> {
+  final List<Term> _terms = [
+    Term(subjectName: 'MIS', examScheduled: DateTime.now()),
+  ];
+
+  String _getExamTime(DateTime dateTime) {
+    String date = dateTime.toLocal().toString();
+    return date;
+  }
+
+  void _addTerm() {
+    showModalBottomSheet<void>(
+        context: context,
+        elevation: 3,
+        enableDrag: true,
+        showDragHandle: true,
+        builder: (_) {
+          return SizedBox(
+            height: 400.0,
+            child: GestureDetector(
+              onTap: () {},
+              behavior: HitTestBehavior.opaque,
+              child: NewTerm(
+                addTermToList: _addTermToList,
+              ),
+            ),
+          );
+        });
+  }
+
+  void _addTermToList(Term term) {
+    setState(() {
+      _terms.add(term);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,42 +81,40 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-              onPressed: () => print('asd'),
-              icon: const Icon(Icons.account_circle_outlined))
+              onPressed: () => _addTerm(),
+              icon: const Icon(Icons.add_circle_outline_sharp))
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => print("sad"),
-      ),
-      body: ListView.builder(
-        itemCount: widget.elements.length,
-        itemBuilder: (context, index) {
-          return Card(
-              child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                alignment: Alignment.center,
-                margin: const EdgeInsets.all(20),
-                child: Text(
-                  widget.elements.elementAt(index),
-                  style: TextStyle(
-                      fontSize: 30, color: Theme.of(context).primaryColorLight),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_box_rounded),
-                onPressed: () {
-                  print(index);
-                },
-              )
-            ],
-          ));
-        },
-      ),
+      body: _terms.isEmpty
+          ? const Center(child: Text('No upcoming terms'))
+          : ListView.builder(
+              itemCount: _terms.length,
+              itemBuilder: (context, index) {
+                return Card(
+                    elevation: 2,
+                    borderOnForeground: true,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        ListTile(
+                          title: Text(
+                            _terms.elementAt(index).subjectName,
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Theme.of(context).primaryColorLight,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            _getExamTime(_terms.elementAt(index).examScheduled),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ));
+              },
+            ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
